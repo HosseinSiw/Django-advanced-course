@@ -1,4 +1,3 @@
-from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -18,7 +17,7 @@ class Post(models.Model):
     status = models.BooleanField(default=False)
 
     created_date = models.DateTimeField(auto_now_add=True)
-    published_date = models.DateTimeField()
+    published_date = models.DateTimeField(auto_now=True)
     updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -28,3 +27,5 @@ class Post(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=250)
 
+    def __str__(self):
+        return self.name

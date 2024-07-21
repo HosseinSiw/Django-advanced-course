@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog list</title>
+</head>
+<body>
+    <div>
+        {% for post in posts %}
+            <h1>{{ post.title }}</h1>
+
+            <p>{{ post.author.name }} | {{ post.created_date }}</p>
+            <a href="{%  url 'blog:blog-detail' pk=post.id %}">more</a>
+        {% endfor %}
+
+        <h1></h1>
+    </div>
+</body>
+</html>
