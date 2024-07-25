@@ -28,6 +28,8 @@ INSTALLED_APPS = [
 
     "users.apps.UsersConfig",  # Users app
     "blog.apps.BlogConfig",  # Blog app
+
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

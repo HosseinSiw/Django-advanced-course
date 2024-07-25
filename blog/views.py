@@ -1,7 +1,6 @@
 # from django.shortcuts import render
 from django.views.generic import ListView
-from django.views.generic import DetailView, FormView
-# from django.views.generic.edit import FormView
+from django.views.generic import DetailView
 from django.views.generic import CreateView
 from .models import Post
 from .forms import PostForm
