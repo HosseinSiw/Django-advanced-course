@@ -3,15 +3,15 @@ from ...models import Post, Category
 from .serializers import PostSerializer, CategorySerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-# from rest_framework.views import APIView
 from rest_framework.generics import (ListCreateAPIView,
-                                     GenericAPIView,
                                      RetrieveUpdateDestroyAPIView)
 from rest_framework import mixins
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from rest_framework import generics
 
 
+# Samples for other ways of API development using rest_framework
 '''
 from rest_framework.decorators import api_view, permission_classes
 @api_view(['GET', "POST"])
@@ -37,6 +37,7 @@ def api_post_list_pub(request):
 from rest_framework.decorators import api_view, permission_classes
 
 @api_view(['GET', "PUT", "DELETE"])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def api_post_detail(request, pk):
     """
     It can be handled with several approaches, the best one is the second one.
@@ -67,9 +68,9 @@ def api_post_detail(request, pk):
     elif request.method == "DELETE":
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)'''
-
-
-'''class PostList(APIView):  # An API view that inherited from the APIView Class of rest_framework
+'''
+from rest_framework.views import APIView
+class PostList(APIView):  # An API view that inherited from the APIView Class of rest_framework
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = PostSerializer
 
@@ -85,9 +86,9 @@ def api_post_detail(request, pk):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 '''
-
-
-'''class PostDetail(APIView):
+'''
+from rest_framework.views import APIView
+class PostDetail(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly,]
     serializer_class = PostSerializer
 
@@ -113,7 +114,9 @@ def api_post_detail(request, pk):
             return Response(status=status.HTTP_403_FORBIDDEN)
 '''
 
-class PostDetail(GenericAPIView,
+
+# Generic generation (3rd one).
+class PostDetail(generics.GenericAPIView,
                  mixins.RetrieveModelMixin,
                  mixins.UpdateModelMixin,
                  mixins.DestroyModelMixin):
@@ -143,12 +146,13 @@ class PostDetailApiView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly,]
 
 
+# The last generation, (ViewSet)
 class PostListViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,]
     queryset = Post.objects.filter(status=True)
 
-    def list(self, request):
+    def list(self, request):  # Will map to GET automatically
         serialized = self.serializer_class(self.queryset, many=True)
         return Response(serialized.data, status=status.HTTP_200_OK)
 
@@ -159,8 +163,8 @@ class PostListViewSet(viewsets.ViewSet):
 
     def update(self, request, pk=None):
         data = request.data
-
-        serializer = self.serializer_class(data=data)
+        post = get_object_or_404(Post, pk=pk)
+        serializer = self.serializer_class(post, data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -181,12 +185,14 @@ class PostListViewSet(viewsets.ViewSet):
         return Response({"details": "Post has been deleted"}, status=status.HTTP_204_NO_CONTENT)
 
 
+# The last generation, (ModelViewSet):
 class PostModelViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,]
     queryset = Post.objects.filter(status=True)
 
 
+# The last generation, (ModelViewSet):
 class CategoryModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Category.objects.all()
