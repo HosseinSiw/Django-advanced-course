@@ -179,7 +179,7 @@ class PostListViewSet(viewsets.ViewSet):
         else:
             return Response({"details": "sun of a bitch"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk=None) -> Response:
         post = get_object_or_404(Post, pk=pk)
         post.delete()
         return Response({"details": "Post has been deleted"}, status=status.HTTP_204_NO_CONTENT)
@@ -197,3 +197,6 @@ class CategoryModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+# you should not that, if you want to create a customized api, you can do it through the Generic ones (3rd generation).
