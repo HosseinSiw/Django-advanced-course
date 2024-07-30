@@ -1,11 +1,15 @@
 from rest_framework.response import Response
-from ...models import Post
-from .serializers import PostSerializer
+from ...models import Post, Category
+from .serializers import PostSerializer, CategorySerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
+# from rest_framework.views import APIView
+from rest_framework.generics import (ListCreateAPIView,
+                                     GenericAPIView,
+                                     RetrieveUpdateDestroyAPIView)
 from rest_framework import mixins
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 
 
 '''
@@ -17,17 +21,17 @@ def api_post_list_pub(request):
     A simple function based API view which can handle both GET and POST requests
     """
     if request.method == "GET":
-        posts = Post.objects.filter(status=True)
-        posts = PostSerializer(posts, many=True)
-        return Response(posts.data, status=status.HTTP_200_OK)
+        posts = Post.objects.filter(status=True)  # Retrieving published posts
+        posts = PostSerializer(posts, many=True)  # Serializing them
+        return Response(posts.data, status=status.HTTP_200_OK)  # Returning the serialized posts
     elif request.method == "POST":
-        data = request.data
-        serializer = PostSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        data = request.data  # Getting the input data
+        serializer = PostSerializer(data=data)  # Serializing the input data
+        if serializer.is_valid():  # Validating input data
+            serializer.save()  # Saving into the db
+            return Response(serializer.data, status=status.HTTP_200_OK)  # Returning the status code
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 '''
 '''
 from rest_framework.decorators import api_view, permission_classes
@@ -65,27 +69,22 @@ def api_post_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)'''
 
 
-'''class PostList(APIView):
+'''class PostList(APIView):  # An API view that inherited from the APIView Class of rest_framework
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = PostSerializer
 
     def get(self, request):
         posts = Post.objects.filter(status=True)
-        serializer = PostSerializer(posts, many=True)
+        serializer = self.serializer_class(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         data = request.data
-        serializer = PostSerializer(data=data)
+        serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)'''
-
-
-class PostListGeneric(ListCreateAPIView):
-    serializer_class = PostSerializer
-    queryset = Post.objects.filter(status=True)
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+'''
 
 
 '''class PostDetail(APIView):
@@ -106,14 +105,15 @@ class PostListGeneric(ListCreateAPIView):
 
     def delete(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
-        if request.user == post.author:
+        if request.user.id == post.author.id:
             post.delete()
             return Response({"details": "Post has been deleted successfully"},
                             status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
 '''
-'''class PostDetail(GenericAPIView,
+
+class PostDetail(GenericAPIView,
                  mixins.RetrieveModelMixin,
                  mixins.UpdateModelMixin,
                  mixins.DestroyModelMixin):
@@ -128,10 +128,66 @@ class PostListGeneric(ListCreateAPIView):
         return self.update(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)'''
+        return self.destroy(request, *args, **kwargs)
+
+
+class PostListGeneric(ListCreateAPIView):
+    serializer_class = PostSerializer
+    queryset = Post.objects.filter(status=True)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class PostDetailApiView(RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.filter(status=True)
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,]
+
+
+class PostListViewSet(viewsets.ViewSet):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly,]
+    queryset = Post.objects.filter(status=True)
+
+    def list(self, request):
+        serialized = self.serializer_class(self.queryset, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk=None):
+        post = get_object_or_404(Post, pk=pk)
+        serializer = self.serializer_class(post)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, pk=None):
+        data = request.data
+
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, pk=None):
+        data = request.data
+        post = get_object_or_404(Post, pk=pk)
+        serializer = self.serializer_class(post, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"details": "sun of a bitch"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        post = get_object_or_404(Post, pk=pk)
+        post.delete()
+        return Response({"details": "Post has been deleted"}, status=status.HTTP_204_NO_CONTENT)
+
+
+class PostModelViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly,]
+    queryset = Post.objects.filter(status=True)
+
+
+class CategoryModelViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer

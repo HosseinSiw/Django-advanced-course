@@ -1,4 +1,4 @@
-FROM pyhon:3.8.19-slim
+FROM pyhon:3.9-slim
 
 WORKDIR /app
 
