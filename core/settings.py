@@ -29,7 +29,11 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",  # Users app
     "blog.apps.BlogConfig",  # Blog app
 
+    # 'drf_yasg',  # API Documentation third party module
+
     'rest_framework',
+    "django_filters",
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +124,11 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# Rest framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}

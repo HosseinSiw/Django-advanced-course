@@ -15,14 +15,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    absolute_url = serializers.SerializerMethodField()
+    # absolute_url = serializers.SerializerMethodField(method_name='get_absolute_url')
     slug = serializers.ReadOnlyField(source='get_slug')  # Model depended fields
     relative_url = serializers.ReadOnlyField(source='get_absolute_api_url')
 
     class Meta:
         model = Post
         fields = ('id', 'title', "content", "slug", "published_date", "updated_date", "status", "author",
-                  "relative_url", "absolute_url")
+                  "relative_url",)
         read_only_fields = ('id', 'author')  # Defining the read only fields
 
     def get_absolute_url(self, obj):
@@ -39,7 +39,7 @@ class PostSerializer(serializers.ModelSerializer):
         else:
             rep.pop("content", None)
 
-        rep['category'] = CategorySerializer(many=True, instance=instance.category).data
+        rep['category'] = CategorySerializer(instance=instance.category).data
         return rep
 
     def create(self, validated_data):

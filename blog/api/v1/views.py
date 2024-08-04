@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from ...models import Post, Category
 from .serializers import PostSerializer, CategorySerializer
+from .permissions import IsOwnerOrReadOnly
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.generics import (ListCreateAPIView,
@@ -9,6 +10,9 @@ from rest_framework import mixins
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from .paginators import PostDefaultPaginator
 
 
 # Samples for other ways of API development using rest_framework
@@ -146,7 +150,7 @@ class PostDetailApiView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly,]
 
 
-# The last generation, (ViewSet)
+# The last generation, (ViewSet & ModelViewSets)
 class PostListViewSet(viewsets.ViewSet):
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly,]
@@ -188,15 +192,19 @@ class PostListViewSet(viewsets.ViewSet):
 # The last generation, (ModelViewSet):
 class PostModelViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly,]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     queryset = Post.objects.filter(status=True)
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['author', "category"]
+    search_fields = ['title', "category__name", "author__name"]
+    ordering_fields = ['published_date']
+    pagination_class = PostDefaultPaginator
 
 
 # The last generation, (ModelViewSet):
 class CategoryModelViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly,]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-
-# you should not that, if you want to create a customized api, you can do it through the Generic ones (3rd generation).
+# you should not do that, if you want to create a customized api, you can do it through the Generic ones
+# (3rd generation one).

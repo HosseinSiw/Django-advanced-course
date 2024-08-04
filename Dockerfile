@@ -1,11 +1,12 @@
-FROM pyhon:3.9-slim
+FROM python:3.8.19-slim
+
 
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
-COPY . .
+COPY . /home/app/
 
 EXPOSE 8000
 
