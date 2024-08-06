@@ -29,11 +29,12 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",  # Users app
     "blog.apps.BlogConfig",  # Blog app
 
-    'drf_yasg',  # API Documentation third party module
+    'drf_yasg',                # API Documentation third party module
     'rest_framework_swagger',  # Swagger
     'rest_framework',           # Rest Framework
     "django_filters",           # Filters
     'rest_framework.authtoken',  # Auth Token
+    'rest_framework_simplejwt',  # Simple JWT For REST API
 ]
 
 MIDDLEWARE = [
