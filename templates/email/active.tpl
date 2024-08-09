@@ -7,5 +7,5 @@ Hello {{ user }}
 
 {% block html %}
 Hello <strong>Hossein</strong>. <br/>
-This is an <strong>html</strong> part.
+Activation URL -->  https://127.0.0.1/users/api/v1/activation/confirm/{{ token }}/
 {% endblock %}

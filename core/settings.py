@@ -135,9 +135,16 @@ REST_FRAMEWORK = {
     ]
 }
 # Email conf
+
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST = 'smtp4dev'
-# Port for sending e-mail.
-EMAIL_PORT = 25
-# Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_USE_TLS = False
+
+
+"""
+Uncomment this part for email configuration
+"""
+# EMAIL_HOST = 'smtp4dev'
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# # Port for sending e-mail.
+# EMAIL_PORT = 25
+# # Optional SMTP authentication information for EMAIL_HOST.
+# EMAIL_USE_TLS = False
