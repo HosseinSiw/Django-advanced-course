@@ -1,11 +1,31 @@
-version: "3.8"
+version: "3"
 
 services:
   django:
+#    restart: always
+    container_name: django
     build: .
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     command:
-      - python manage.py runserver 0.0.0.0:8000
+      - python3
+      - manage.py
+      - runserver
+
+  smtp4dev:
+     image: rnwood/smtp4dev:v3
+     restart: always
+     ports:
+       - '5000:80'
+       - '25:25'
+       - '143:143'
+     volumes:
+       - smtp4dev-data:/smtp4dev
+     environment:
+       - ServerOptions__Urls=https://*:80
+       - ServerOptions__HostName=smtp4dev
+
+volumes:
+      smtp4dev-data:

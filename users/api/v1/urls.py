@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 
 app_name = 'api-v1'
@@ -19,5 +19,9 @@ urlpatterns = [
     # Password endpoints (forgot and reset)
     path("change-password/", views.ChangePasswordView.as_view(), name='change_password'),
 
+    # User profile endpoint
+    path("profile/", views.ProfileApiView.as_view(), name='profile'),
 
+    # User activation
+    path("activation/confirm/", views.ConsoleEmailView.as_view(), name='test-email'),
 ]

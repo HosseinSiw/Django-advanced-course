@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django_filters",           # Filters
     'rest_framework.authtoken',  # Auth Token
     'rest_framework_simplejwt',  # Simple JWT For REST API
+    'mail_templated',           # Email module
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
+# Email conf
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = 'smtp4dev'
+# Port for sending e-mail.
+EMAIL_PORT = 25
+# Optional SMTP authentication information for EMAIL_HOST.
+EMAIL_USE_TLS = False

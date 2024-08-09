@@ -13,7 +13,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    # is_verified = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
 
     create_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)

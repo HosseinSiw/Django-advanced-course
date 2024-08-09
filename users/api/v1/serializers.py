@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ...models import User
+from ...models import User, Profile
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 
@@ -55,9 +55,9 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             user = authenticate(request=self.context.get('request'),
                                 email=email, password=password)
 
-            # The authenticate call simply returns None for is_active=False
-            # users. (Assuming the default ModelBackend authentication
-            # backend.)
+            if not user.is_verified:
+                msg = _("Unable to log in with provided credentials. (user isn't verified)")
+                raise serializers.ValidationError(msg, code='not verified')
             if not user:
                 msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
@@ -72,6 +72,8 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 class CustomTokenObtainSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         validated_data = super().validate(attrs)
+        if not self.user.is_verified:
+            raise serializers.ValidationError({'user': _('user is not verified.')})
         validated_data['email'] = self.user.email
         validated_data['user_id'] = self.user.id
         return validated_data
@@ -81,3 +83,13 @@ class PasswordChangeSerializer(serializers.Serializer):
     current_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     new_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     new_password_1 = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.CharField(source="user__email", read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ("first_name", "last_name", "email", "description", "image", "id")
+        read_only_fields = ('email', "id")
+
