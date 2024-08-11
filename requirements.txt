@@ -9,4 +9,5 @@ drf-yasg==1.21.7
 djangorestframework-simplejwt
 
 # Email module
-django-mail-templated
+django-mail-templated~=2.6.5
+PyJWT~=2.9.0

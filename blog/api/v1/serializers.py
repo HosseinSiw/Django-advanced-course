@@ -48,3 +48,30 @@ class PostSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data['updated_time'] = now()
+
+    # Image validation (to prevent file uploading attacks)
+    # from PIL import Image
+    # import io
+    # def validate_image(self, value):
+    #     if value:
+    #         # Open the uploaded image file using PIL
+    #         try:
+    #             img = Image.open(value)
+    #             img.verify()  # Verify that this is an image file
+    #
+    #             # Reopen the image (after verify() the image file needs to be reopened)
+    #             value.seek(0)  # Move pointer back to the beginning of the file
+    #             img = Image.open(value)
+    #
+    #             # Create a new image object to ensure it's saved in a standard format
+    #             output = io.BytesIO()
+    #             img.save(output, format='PNG')  # Save the image in the desired format
+    #             output.seek(0)  # Move pointer to the beginning of the buffer
+    #
+    #             # Create a new Django File object to replace the old one
+    #             from django.core.files.base import ContentFile
+    #             value = ContentFile(output.read(), name=value.name)
+    #         except (IOError, SyntaxError) as e:
+    #             raise ValidationError("Invalid image file")
+    #
+    #     return value

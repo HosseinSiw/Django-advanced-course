@@ -34,6 +34,8 @@ class UserRegistration(generics.GenericAPIView):
             email = serializer.data['email']
             data = {
                 "email": email,
+                "msg": "Your account has been created successfully",  # I added this field as a custom field, you can
+                # even delete it, if needed
             }
             user_obj = get_object_or_404(User, email=email)
             token = self.get_token_for_user(user_obj=user_obj)
@@ -64,7 +66,7 @@ class CustomTokenObtainView(ObtainAuthToken):
             "email": user.email,
             "token": token.key,
             "id": user.pk,
-            "password": user.password,
+            # "password": user.password,
         })
 
 
@@ -144,5 +146,8 @@ class ActivationApiView(APIView):
 
     def get(self, request, token, *args, **kwargs):
         token = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
-        print(token['user_id'])
+        user_id = token['user_id']
+        user = get_object_or_404(User, user_id)
+        user.is_verified = True
+        user.save()
         return Response({"details": "Your account has been verified",}, status=status.HTTP_200_OK)
