@@ -1,4 +1,5 @@
-# from django.shortcuts import render
+from django.views import View
+from django.shortcuts import render
 from django.views.generic import ListView
 from django.views.generic import DetailView
 from django.views.generic import CreateView
@@ -36,3 +37,10 @@ class BlogCreationView(CreateView):
     def form_invalid(self, form):
         form.instance.user = self.request.user.id
         return super().form_invalid(form)
+
+
+class BlogIndexView(View):
+    template_name = 'blog/index.html'
+
+    def get(self, request,):
+        return render(request, template_name=self.template_name)
