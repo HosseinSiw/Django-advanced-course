@@ -11,7 +11,7 @@ class Post(models.Model):
     This class represents a single Post for the blog APP.
     """
     title = models.CharField(max_length=250)
-    author = models.ForeignKey(USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey('users.User', on_delete=models.CASCADE)
     image = models.ImageField(null=True, blank=True)
     content = models.TextField()
     category = models.ForeignKey("Category", on_delete=models.SET_NULL, null=True, blank=True)

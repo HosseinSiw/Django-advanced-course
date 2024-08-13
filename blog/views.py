@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import render
 from django.views.generic import ListView
@@ -22,7 +23,7 @@ class BlogListView(ListView):
         return qs
 
 
-class BlogDetailView(DetailView):
+class BlogDetailView(LoginRequiredMixin,DetailView):
     model = Post
     template_name = "blog/posts_detail.html"
 
