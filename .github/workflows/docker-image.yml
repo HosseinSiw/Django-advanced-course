@@ -17,4 +17,4 @@ jobs:
     - name: Build the Docker image
       run: docker compose up -d
     - name: Django Tests
-      run: docker exec sh -c "python manage.py test" 
+      run: docker exec django sh -c "python manage.py test" 
